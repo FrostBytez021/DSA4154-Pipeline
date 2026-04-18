@@ -1,9 +1,8 @@
 name: Daily Data Pipeline
-
-on:
+on: 
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # Runs daily at midnight UTC
-  workflow_dispatch: # Allows you to run it manually by clicking a button!
+    - cron: '0 * * * *'
 
 jobs:
   run-pipeline:

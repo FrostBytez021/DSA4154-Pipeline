@@ -4,6 +4,7 @@ import json
 import os
 import requests
 import pandas as pd
+import time  # <-- NEW: We need this to pause between requests
 
 # --- 1. DATA EXTRACTION ---
 stations = {
@@ -36,33 +37,41 @@ def get_remarks(aqi):
 
 combined_records = []
 
+print("Starting API extraction...")
+
 for station, coords in stations.items():
+    print(f"Fetching {station}...") # <-- NEW: Shows progress in the logs
     url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={coords['lat']}&longitude={coords['lon']}&current=pm10,pm2_5,us_aqi_pm2_5,us_aqi_pm10&timezone=Asia%2FManila"
     
-    response = requests.get(url)
-    json_data = response.json()
+    try:
+        # <-- NEW: timeout=10 stops it from freezing forever
+        response = requests.get(url, timeout=10) 
+        json_data = response.json()
+        
+        current_data = json_data['current']
+        time_recorded = current_data['time'] 
+        
+        pm10 = current_data['pm10']
+        aqi_pm10 = current_data['us_aqi_pm10']
+        remarks_pm10 = get_remarks(aqi_pm10)
+        
+        pm25 = current_data['pm2_5']
+        aqi_pm25 = current_data['us_aqi_pm2_5']
+        remarks_pm25 = get_remarks(aqi_pm25)
+        
+        combined_records.append([
+            time_recorded, 
+            station, 
+            pm10, aqi_pm10, remarks_pm10, 
+            pm25, aqi_pm25, remarks_pm25
+        ])
+    except Exception as e:
+        print(f"⚠️ Failed to get {station}: {e}")
     
-    current_data = json_data['current']
-    time_recorded = current_data['time'] 
-    
-    pm10 = current_data['pm10']
-    aqi_pm10 = current_data['us_aqi_pm10']
-    remarks_pm10 = get_remarks(aqi_pm10)
-    
-    pm25 = current_data['pm2_5']
-    aqi_pm25 = current_data['us_aqi_pm2_5']
-    remarks_pm25 = get_remarks(aqi_pm25)
-    
-    combined_records.append([
-        time_recorded, 
-        station, 
-        pm10, aqi_pm10, remarks_pm10, 
-        pm25, aqi_pm25, remarks_pm25
-    ])
-
+    # <-- NEW: Pause for 1.5 seconds so the API doesn't block us
+    time.sleep(1.5) 
 
 # --- 2. TERMINAL VISUALIZATION FOR THE DEMO ---
-# Creating a DataFrame just to print it beautifully to the terminal
 headers = ["Time", "Station", "PM10", "AQI(PM10)", "Remarks(PM10)", "PM2.5", "AQI(PM2.5)", "Remarks(PM2.5)"]
 demo_df = pd.DataFrame(combined_records, columns=headers)
 
@@ -74,6 +83,7 @@ print("="*110 + "\n")
 
 
 # --- 3. GOOGLE SHEETS UPLOAD ---
+print("Connecting to Google Sheets...")
 scopes = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"

@@ -8,7 +8,7 @@
 
 This is an **automated data pipeline** that collects live air quality data across 17 monitoring stations in Metro Manila, stores it in a cloud database, and serves as the foundation for a public health advisory dashboard.
 
-The pipeline tracks two key air pollutants — **PM10** and **PM2.5** (fine particulate matter) — and converts raw measurements into a standardized **Air Quality Index (AQI)** with human-readable health status labels (e.g., *"GOOD"*, *"FAIR"*, *"ACUTELY UNHEALTHY"*). This project addresses the lack of public awareness around air quality hazards in Metro Manila, where 13 million residents are exposed to unsafe pollution levels daily.
+The pipeline tracks two key air pollutants **PM10** and **PM2.5** (fine particulate matter) and converts raw measurements into a standardized **Air Quality Index (AQI)** with human-readable health status labels (e.g., *"GOOD"*, *"FAIR"*, *"ACUTELY UNHEALTHY"*). This project addresses the lack of public awareness around air quality hazards in Metro Manila, where 13 million residents are exposed to unsafe pollution levels daily.
 
 ---
 
@@ -126,7 +126,7 @@ The script will print a live table of extracted air quality data in the terminal
 
 ---
 
-## 📦 Dependencies
+## Libraries
 
 | Package | Purpose |
 |---------|---------|

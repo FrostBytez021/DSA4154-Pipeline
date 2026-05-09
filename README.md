@@ -153,3 +153,8 @@ Mikaela Angela C. Carlos, Drei Cerise B. Dayag, Althea Marie S. Habaluyas, Marga
 ## Data Source
 
 Air quality data is sourced from the **[Open-Meteo Air Quality API](https://air-quality-api.open-meteo.com/v1/air-quality)** — a free, open-source API that provides real-time environmental data without authentication or unauthorized scraping of government dashboards.
+
+---
+
+## Tableau Live Dashboard
+https://public.tableau.com/views/AIRQUALITYDASHBOARD_17782384629840/Dashboard1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link

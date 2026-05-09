@@ -20,7 +20,6 @@ stations = {
     "Paranaque City": {"lat": 14.4793, "lon": 121.0198},
     "Pasay": {"lat": 14.5378, "lon": 121.0014},
     "Pasig City": {"lat": 14.5764, "lon": 121.0851},
-    "Quezon City(Ateneo)": {"lat": 14.6394, "lon": 121.0781},
     "Quezon City(SMPH Commonwealth)": {"lat": 14.6682, "lon": 121.0662},
     "San Juan City": {"lat": 14.6042, "lon": 121.0300},
     "Taguig (TUP)": {"lat": 14.5093, "lon": 121.0451},

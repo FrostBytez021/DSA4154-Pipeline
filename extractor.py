@@ -4,7 +4,7 @@ import json
 import os
 import requests
 import pandas as pd
-import time  # <-- NEW: We need this to pause between requests
+import time
 
 # --- 1. DATA EXTRACTION ---
 stations = {
@@ -35,54 +35,56 @@ def get_remarks(aqi):
     else: return "EMERGENCY"
 
 combined_records = []
-
 print("Starting API extraction...")
 
 for station, coords in stations.items():
-    print(f"Fetching {station}...") 
+    print(f"Fetching {station}...")
     url = f"https://air-quality-api.open-meteo.com/v1/air-quality?latitude={coords['lat']}&longitude={coords['lon']}&current=pm10,pm2_5,us_aqi_pm2_5,us_aqi_pm10&timezone=Asia%2FManila"
-    
-    # NEW: Try up to 3 times per station before giving up
-    for attempt in range(3): 
+
+    for attempt in range(3):
         try:
-            response = requests.get(url, timeout=10) 
+            response = requests.get(url, timeout=10)
             json_data = response.json()
-            
+
             current_data = json_data['current']
-            time_recorded = current_data['time'] 
-            
+            time_recorded = current_data['time']
+
             pm10 = current_data['pm10']
             aqi_pm10 = current_data['us_aqi_pm10']
             remarks_pm10 = get_remarks(aqi_pm10)
-            
+
             pm25 = current_data['pm2_5']
             aqi_pm25 = current_data['us_aqi_pm2_5']
             remarks_pm25 = get_remarks(aqi_pm25)
-            
+
             combined_records.append([
-                time_recorded, station, 
-                pm10, aqi_pm10, remarks_pm10, 
+                time_recorded, station,
+                coords['lat'], coords['lon'],  # ← NEW: lat & lon added here
+                pm10, aqi_pm10, remarks_pm10,
                 pm25, aqi_pm25, remarks_pm25
             ])
-            
-            break # Success! Break out of the retry loop and move to the next station
-            
+
+            break
+
         except Exception as e:
             print(f"⚠️ Timeout for {station}. Retrying ({attempt + 1}/3)...")
-            time.sleep(2) # Wait 2 seconds before retrying
-    
-    time.sleep(1.5) # Pause between stations
+            time.sleep(2)
+
+    time.sleep(1.5)
 
 # --- 2. TERMINAL VISUALIZATION FOR THE DEMO ---
-headers = ["Time", "Station", "PM10", "AQI(PM10)", "Remarks(PM10)", "PM2.5", "AQI(PM2.5)", "Remarks(PM2.5)"]
+headers = [
+    "Time", "Station",
+    "Latitude", "Longitude",  # ← NEW: headers added here
+    "PM10", "AQI(PM10)", "Remarks(PM10)",
+    "PM2.5", "AQI(PM2.5)", "Remarks(PM2.5)"
+]
 demo_df = pd.DataFrame(combined_records, columns=headers)
-
-print("\n" + "="*110)
+print("\n" + "="*130)
 print(" 📡 LIVE METRO MANILA AIR QUALITY DATA EXTRACTED ")
-print("="*110)
+print("="*130)
 print(demo_df.to_string(index=False))
-print("="*110 + "\n")
-
+print("="*130 + "\n")
 
 # --- 3. GOOGLE SHEETS UPLOAD ---
 print("Connecting to Google Sheets...")
@@ -99,7 +101,6 @@ else:
     creds = Credentials.from_service_account_file("credentials.json", scopes=scopes)
 
 client = gspread.authorize(creds)
-sheet = client.open("DSA4154_Dummy_DB").sheet1 
-
+sheet = client.open("DSA4154_Dummy_DB").sheet1
 sheet.append_rows(combined_records)
 print(f"✅ Success! Appended {len(combined_records)} rows of live station data to Google Sheets.")

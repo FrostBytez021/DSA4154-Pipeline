@@ -59,9 +59,9 @@ for station, coords in stations.items():
 
             combined_records.append([
                 time_recorded, station,
-                coords['lat'], coords['lon'],  # ← NEW: lat & lon added here
                 pm10, aqi_pm10, remarks_pm10,
-                pm25, aqi_pm25, remarks_pm25
+                pm25, aqi_pm25, remarks_pm25,
+                coords['lat'], coords['lon']  # ← Moved to the end
             ])
 
             break
@@ -75,9 +75,9 @@ for station, coords in stations.items():
 # --- 2. TERMINAL VISUALIZATION FOR THE DEMO ---
 headers = [
     "Time", "Station",
-    "Latitude", "Longitude",  # ← NEW: headers added here
     "PM10", "AQI(PM10)", "Remarks(PM10)",
-    "PM2.5", "AQI(PM2.5)", "Remarks(PM2.5)"
+    "PM2.5", "AQI(PM2.5)", "Remarks(PM2.5)",
+    "Latitude", "Longitude"  # ← Moved to the end
 ]
 demo_df = pd.DataFrame(combined_records, columns=headers)
 print("\n" + "="*130)
@@ -104,3 +104,4 @@ client = gspread.authorize(creds)
 sheet = client.open("DSA4154_Dummy_DB").sheet1
 sheet.append_rows(combined_records)
 print(f"✅ Success! Appended {len(combined_records)} rows of live station data to Google Sheets.")
+
